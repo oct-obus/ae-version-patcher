@@ -1,10 +1,10 @@
 # AE Version Patcher
 
-Extend Adobe After Effects 26's **"Save a Copy As"** menu to support saving projects as older AE versions — down to **CC 2017 (v14)**.
+Extend Adobe After Effects 26's **"Save a Copy As"** menu to support saving projects as older AE versions -- down to **CC 2017 (v14)**.
 
 ## How It Works
 
-After Effects 26 normally only offers saving as AE 24 or AE 25. This limitation is **purely artificial** — AE 26's serialization engine already contains version-conditional logic going all the way back to CC 2017, inherited from every previous release.
+After Effects 26 normally only offers saving as AE 24 or AE 25. This limitation is **purely artificial** -- AE 26's serialization engine already contains version-conditional logic going all the way back to CC 2017, inherited from every previous release.
 
 This tool patches **exactly 2 bytes** in `BEE.dll` (AE's core engine DLL) to change which two versions appear in the "Save a Copy As" menu. AE then uses its own built-in conditional serializer to properly handle format differences for the target version.
 
@@ -67,19 +67,19 @@ The `--min-version` flag sets the **older** of the two menu items. The newer ite
    ```
    copy BEE_patched.dll BEE.dll
    ```
-6. Launch After Effects → **File → Save a Copy As** should show the new versions
+6. Launch After Effects, then go to **File > Save a Copy As** -- it should show the new versions
 
 ### To revert
 
 Replace `BEE.dll` with your backup (`BEE.dll.bak`), or re-run the patcher with `--min-version 24` (stock behavior).
 
-## ⚠️ Important Notes
+## Important Notes
 
 - **AE 26 only.** The patch offsets (`0x4F9B1F` and `0x4F9BC2`) are specific to AE 26's `BEE.dll`. Other AE versions have different offsets.
 - **Always back up** your original `BEE.dll` before patching.
 - **Adobe integrity checks** may detect the modification. If AE refuses to start, restore the backup.
-- **Feature loss is expected.** Saving as an older version drops features that version doesn't support (new 3D geometry streams, material projections, etc.). This is the same behavior as AE's built-in "Save as Previous" — it's a lossy conversion by design.
-- **Extreme downgrades** (e.g., AE 26 → CC 2017) cross multiple format boundary changes. While the serialization thresholds exist in the code, edge cases in deeply nested structures may not be perfectly handled. Test thoroughly with your specific projects.
+- **Feature loss is expected.** Saving as an older version drops features that version doesn't support (new 3D geometry streams, material projections, etc.). This is the same behavior as AE's built-in "Save as Previous" -- it's a lossy conversion by design.
+- **Extreme downgrades** (e.g., AE 26 to CC 2017) cross multiple format boundary changes. While the serialization thresholds exist in the code, edge cases in deeply nested structures may not be perfectly handled. Test thoroughly with your specific projects.
 - **The AE 23 format break** (officially announced by Adobe) added 4 bytes to `ldta` chunks. AE 26's serializer should handle this since the threshold exists in the binary, but projects with complex layer structures should be tested.
 
 ## Technical Details
@@ -95,7 +95,7 @@ This function builds an `std::set<int>` of supported target versions. Stock AE 2
 - `0x16` (internal version 22 = AE 25) at file offset `0x4F9B1F`
 - `0x15` (internal version 21 = AE 24) at file offset `0x4F9BC2`
 
-The instruction is `mov dword [rax+0x1c], <value>` — we change only the immediate operand byte.
+The instruction is `mov dword [rax+0x1c], <value>` -- we change only the immediate operand byte.
 
 ### Validation chain
 
@@ -104,7 +104,7 @@ The instruction is `mov dword [rax+0x1c], <value>` — we change only the immedi
 ### Version number systems
 
 ```
-AE Public Ver  →  Internal Ver  →  File Format Byte
+AE Public Ver  ->  Internal Ver  ->  File Format Byte
     14 (CC2017)       11              0x5B
     15 (CC2018)       12              0x5C  (note: 0x5C is also 2021/18.x)
     ...
@@ -119,7 +119,7 @@ Formula: `internal = public - 3`, `file_byte = internal + 0x4A`
 
 ### Serialization threshold scan results
 
-All `ShouldReadWriteForVersion` functions use `cmp eax, <composite>; setae al` (return true if version ≥ threshold):
+All `ShouldReadWriteForVersion` functions use `cmp eax, <composite>; setae al` (return true if version >= threshold):
 
 | Composite | AE Version | Functions in AE 26 |
 |-----------|-----------|-------------------|

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AE Version Patcher — Extend After Effects "Save a Copy As" Version Range
+AE Version Patcher -- Extend After Effects "Save a Copy As" Version Range
 
 Patches Adobe After Effects 26's BEE.dll to unlock saving projects as older
 AE versions (down to CC 2017) using AE's own built-in version-conditional
@@ -12,7 +12,7 @@ This tool changes which two versions appear in that menu.
 IMPORTANT:
   - This tool ONLY works with AE 26's BEE.dll (the offsets are version-specific)
   - Always back up the original BEE.dll before patching
-  - Adobe may detect the modification — use at your own risk
+  - Adobe may detect the modification -- use at your own risk
   - The patched AE will show exactly 2 "Save a Copy As" menu items
 
 Usage:
@@ -80,17 +80,17 @@ KNOWN_THRESHOLDS = [
 
 
 def internal_version(ae_public: int) -> int:
-    """AE public version → internal version number."""
+    """AE public version -> internal version number."""
     return ae_public - 3
 
 
 def ae_public(internal: int) -> int:
-    """Internal version number → AE public version."""
+    """Internal version number -> AE public version."""
     return internal + 3
 
 
 def file_format_byte(internal: int) -> int:
-    """Internal version number → file format header byte."""
+    """Internal version number -> file format header byte."""
     return internal + 0x4A
 
 
@@ -197,15 +197,15 @@ Example: --min-version 22 gives you "Save as AE 22" and "Save as AE 23"
     with open(args.output, "wb") as f:
         f.write(data)
 
-    print(f"\n✅ Patched successfully → {args.output}")
+    print(f"\nPatched successfully -> {args.output}")
     print(f"\nTo install:")
     print(f"  1. Close After Effects completely")
     print(f"  2. Navigate to your AE 26 install directory:")
     print(f"     C:\\Program Files\\Adobe\\Adobe After Effects 2026\\Support Files\\")
-    print(f"  3. Rename original BEE.dll → BEE.dll.bak")
-    print(f"  4. Copy {args.output} → BEE.dll")
+    print(f"  3. Rename original BEE.dll -> BEE.dll.bak")
+    print(f"  4. Copy {args.output} -> BEE.dll")
     print(f"  5. Launch After Effects")
-    print(f"  6. File → Save a Copy As → should show {version_display(min_ver)} and {version_display(max_ver)}")
+    print(f"  6. File -> Save a Copy As -> should show {version_display(min_ver)} and {version_display(max_ver)}")
 
 
 if __name__ == "__main__":
