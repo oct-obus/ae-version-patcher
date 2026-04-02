@@ -1,5 +1,5 @@
 # AE Version Patcher - Interactive Installer
-# Requires: Python 3, ae_version_patcher.py in the same directory
+# Requires: uv (https://docs.astral.sh/uv/)
 #Requires -Version 5.1
 
 $ErrorActionPreference = "Stop"
@@ -8,6 +8,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $configFile = Join-Path $scriptDir "ae_patcher_config.txt"
 $backupFile = Join-Path $scriptDir "BEE.dll.original"
 $patcherScript = Join-Path $scriptDir "ae_version_patcher.py"
+$venvDir = Join-Path $scriptDir ".venv"
 
 $defaultAEPath = "C:\Program Files\Adobe\Adobe After Effects 2026\Support Files"
 
@@ -27,6 +28,41 @@ $versionEntries = @(
 )
 
 # --- Helper functions ---
+
+function Ensure-UvSetup {
+    # Check if uv is available
+    $uvPath = Get-Command uv -ErrorAction SilentlyContinue
+    if (-not $uvPath) {
+        Write-Host ""
+        Write-Host "  'uv' is not installed or not in PATH." -ForegroundColor Red
+        Write-Host "  Install it from: https://docs.astral.sh/uv/" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "  Quick install: powershell -ExecutionPolicy ByPass -c `"irm https://astral.sh/uv/install.ps1 | iex`"" -ForegroundColor DarkGray
+        Write-Host ""
+        Write-Host "  Press any key to exit..." -ForegroundColor DarkGray
+        [Console]::ReadKey($true) | Out-Null
+        exit 1
+    }
+
+    # Run uv sync if .venv doesn't exist yet
+    if (-not (Test-Path $venvDir)) {
+        Write-Host "  First run: installing dependencies via uv sync..." -ForegroundColor Yellow
+        Push-Location $scriptDir
+        $syncResult = & uv sync 2>&1
+        $syncExit = $LASTEXITCODE
+        Pop-Location
+        if ($syncExit -ne 0) {
+            Write-Host "  uv sync failed:" -ForegroundColor Red
+            $syncResult | ForEach-Object { Write-Host "    $_" -ForegroundColor Red }
+            Write-Host ""
+            Write-Host "  Press any key to exit..." -ForegroundColor DarkGray
+            [Console]::ReadKey($true) | Out-Null
+            exit 1
+        }
+        Write-Host "  Dependencies installed." -ForegroundColor Green
+        Write-Host ""
+    }
+}
 
 function Get-AEPath {
     if (Test-Path $configFile) {
@@ -250,7 +286,7 @@ function Apply-Patch {
 
     $patchSource = if (Test-Path $backupFile) { $backupFile } else { $beePath }
 
-    $pythonResult = & python $patcherScript $patchSource $patchedFile --min-version $selectedVersion 2>&1
+    $pythonResult = & uv run --directory $scriptDir python $patcherScript $patchSource $patchedFile --min-version $selectedVersion 2>&1
     $exitCode = $LASTEXITCODE
 
     if ($exitCode -ne 0) {
@@ -323,6 +359,8 @@ function Restore-Original {
 }
 
 # --- Main loop ---
+
+Ensure-UvSetup
 
 while ($true) {
     Write-Header

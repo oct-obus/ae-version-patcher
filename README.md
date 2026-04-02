@@ -29,8 +29,7 @@ This approach has been verified on both AE 24 and AE 26 BEE.dll files, which hav
 
 ## Requirements
 
-- Python 3
-- `pefile` module (`pip install pefile`)
+- [uv](https://docs.astral.sh/uv/) (manages Python + dependencies automatically)
 
 ## Quick Start (PowerShell Installer)
 
@@ -40,31 +39,32 @@ The easiest way to use this on Windows is the interactive installer:
 .\install.ps1
 ```
 
-It provides an arrow-key driven menu for version selection, automatic backup, and admin elevation for the copy to Program Files.
+On first run it automatically calls `uv sync` to install Python and dependencies. Then it provides an arrow-key driven menu for version selection, automatic backup, and admin elevation for the copy to Program Files.
 
 ## CLI Usage
 
 ```bash
-python ae_version_patcher.py <input_BEE.dll> <output_BEE.dll> [--min-version N]
+uv sync
+uv run python ae_version_patcher.py <input_BEE.dll> <output_BEE.dll> [--min-version N]
 ```
 
 ### Inspect current state (no patching)
 
 ```bash
-python ae_version_patcher.py BEE.dll /dev/null
+uv run python ae_version_patcher.py BEE.dll /dev/null
 ```
 
 ### Examples
 
 ```bash
 # Save as AE 22 (2022) / AE 23 (2023)
-python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 22
+uv run python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 22
 
 # Save as CC 2017 (v14) / CC 2018 (v15)
-python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 14
+uv run python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 14
 
 # Save as 2021 (v18) / AE 22 (2022)  -- handles the 18->22 gap
-python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 18
+uv run python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 18
 ```
 
 The `--min-version` flag sets the **older** of the two menu items. The newer item is the next AE version (handling the 18->22 version gap automatically).
@@ -93,7 +93,8 @@ The `--min-version` flag sets the **older** of the two menu items. The newer ite
    ```
 4. Run the patcher:
    ```bash
-   python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 22
+   uv sync
+   uv run python ae_version_patcher.py BEE.dll BEE_patched.dll --min-version 22
    ```
 5. Replace the original:
    ```
