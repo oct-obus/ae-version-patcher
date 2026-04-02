@@ -8,6 +8,9 @@ dist/
 build/
 *.egg-info/
 
+# Virtual environment
+.venv/
+
 # IDE
 .vscode/
 .idea/

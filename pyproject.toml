@@ -1,0 +1,8 @@
+[project]
+name = "ae-version-patcher"
+version = "1.0.0"
+description = "Extend After Effects Save a Copy As menu to support older versions"
+requires-python = ">=3.9"
+dependencies = [
+    "pefile>=2023.2.7",
+]
